@@ -1,14 +1,17 @@
 package com.picpaychallenge.services;
 
 import java.math.BigDecimal;
-import java.util.Optional;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.picpaychallenge.model.Type;
+import com.picpaychallenge.dto.UserDto;
+import com.picpaychallenge.model.TypeUser;
 import com.picpaychallenge.model.User;
 import com.picpaychallenge.repository.UserRepository;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class UserService {
@@ -18,7 +21,7 @@ public class UserService {
 
     public void validateTransfer(User sender, BigDecimal amount) throws Exception {
 
-        if (sender.getUserType() == Type.LOJISTA) {
+        if (sender.getUserType() == TypeUser.LOJISTA) {
             throw new Exception("Lojistas não podem realizar transferencias.");
         }
         if (sender.getBalance().compareTo(amount) < 0) {
@@ -26,15 +29,26 @@ public class UserService {
         }
     }
 
-    public User findUser(Long id) throws Exception {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isEmpty()) {
-            throw new Exception("User not found.");
+    public User findUser(Long id) throws EntityNotFoundException {
+        if (id == null) {
+            throw new IllegalArgumentException("ID não pode ser nulo.");
         }
-        return user.get();
+
+        return userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado com ID: " + id));
+    }
+
+    public User createUser(UserDto data) {
+        User user = new User(data);
+        this.saveUser(user);
+        return user;
     }
 
     public void saveUser(User user) {
         this.userRepository.save(user);
+    }
+
+    public List<User> findAll() {
+        return this.userRepository.findAll();
     }
 }

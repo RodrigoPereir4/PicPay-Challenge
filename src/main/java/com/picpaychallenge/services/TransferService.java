@@ -27,7 +27,10 @@ public class TransferService {
     @Autowired
     private RestTemplate restTemplate;
 
-    public void createTransfer(TransferDto transfer) throws Exception {
+    @Autowired
+    private NotifyService notifyService;
+
+    public Transfer createTransfer(TransferDto transfer) throws Exception {
         User sender = this.userService.findUser(transfer.senderId());
         User receiver = this.userService.findUser(transfer.receiverId());
 
@@ -42,13 +45,18 @@ public class TransferService {
         newTransfer.setSender(sender);
         newTransfer.setReceiver(receiver);
         newTransfer.setTimestamp(LocalDateTime.now());
-        
+
         sender.setBalance(sender.getBalance().subtract(transfer.value()));
         receiver.setBalance(receiver.getBalance().add(transfer.value()));
 
         transferRepository.save(newTransfer);
         userService.saveUser(sender);
         userService.saveUser(receiver);
+
+        this.notifyService.sendNotification(sender, "Transação sucessida");
+        this.notifyService.sendNotification(receiver, "Transação recebida!");
+
+        return newTransfer;
     }
 
     public boolean authorizeTransfer(User sender, BigDecimal value) {

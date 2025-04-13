@@ -15,14 +15,15 @@ public class NotifyService {
     @Autowired
     private RestTemplate restTemplate;
 
-    public void sendNotification(User user, String message) throws Exception{
+    public void sendNotification(User user, String message) throws Exception {
         NotifyDto notificationRequest = new NotifyDto(user.getEmail(), message);
-       ResponseEntity<String> notifyResponse = restTemplate.postForEntity("https://util.devi.tools/api/v1/notify)",
-        notificationRequest, String.class);
+        ResponseEntity<String> notifyResponse = restTemplate.postForEntity("https://util.devi.tools/api/v1/notify)",
+                notificationRequest, String.class);
 
-        if(!(notifyResponse.getStatusCode() == HttpStatus.OK)){
-            System.out.println("ERRO NA NOTIFICAÇÃO");
-            throw new Exception("Seviço fora.");
-        }
+                //NO MOMENTO O SERVIÇO ESTÁ FORA DE AR.
+        //if (!(notifyResponse.getStatusCode() == HttpStatus.OK)) {
+        //    System.out.println("ERRO NA NOTIFICAÇÃO");
+        //    throw new Exception("Seviço fora.");
+        //}
     }
 }
