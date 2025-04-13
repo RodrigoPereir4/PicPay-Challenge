@@ -1,6 +1,6 @@
 package com.picpaychallenge.model;
 
-public enum Type {
+public enum TypeUser {
     
     COMUM,
     LOJISTA
